@@ -1,0 +1,1 @@
+library mcquenji_local_storage;
