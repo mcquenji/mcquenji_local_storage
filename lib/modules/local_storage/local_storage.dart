@@ -27,6 +27,14 @@ export 'utils/utils.dart';
 /// }
 /// ```
 class LocalStorageModule extends Module {
+  /// Base URL to get the package info (web only).
+  ///
+  /// See [PackageInfo.fromPlatform] for more information.
+  static String? baseUrl;
+
+  /// Path to store data in when running in debug mode (non-web).
+  static String debugPath = './build/debug';
+
   @override
   List<Module> get imports => [
         CoreModule(),
@@ -34,10 +42,16 @@ class LocalStorageModule extends Module {
 
   @override
   void exportedBinds(Injector i) {
-    i.addLazySingleton<Future<PackageInfo>>(PackageInfo.fromPlatform);
+    i.addLazySingleton<Future<PackageInfo>>(() => PackageInfo.fromPlatform(baseUrl: baseUrl));
 
     if (PlatformUtils.isDesktop || PlatformUtils.isMobile) {
-      i.add<PathResolverService>(Platform.isLinux ? LinuxPathResolverService.new : DefaultPathResolverService.new);
+      i.add<PathResolverService>(
+        kDebugMode
+            ? () => DebugPathResolverService(debugPath)
+            : Platform.isLinux
+                ? LinuxPathResolverService.new
+                : DefaultPathResolverService.new,
+      );
     }
 
     if (kIsWeb) {
