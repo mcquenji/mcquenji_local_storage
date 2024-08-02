@@ -22,9 +22,7 @@ class WebLocalStorageDatasource extends LocalStorageDatasource {
   }
 
   @override
-  Future<bool> exists<T>() async {
-    return _cookieService.exists(T.toString());
-  }
+  Future<bool> exists<T>() async => _cookieService.exists(T.toString());
 
   @override
   Future<T> read<T>() async {
@@ -38,18 +36,14 @@ class WebLocalStorageDatasource extends LocalStorageDatasource {
       throw e;
     }
 
-    final serde = getSerde<T>();
-
     log('Read $T');
 
-    return serde.deserialize(jsonDecode(data));
+    return deserialize(jsonDecode(data));
   }
 
   @override
   Future<void> write<T>(T data) async {
-    final serde = getSerde<T>();
-
-    final encoded = jsonEncode(serde.serialize(data));
+    final encoded = jsonEncode(serialize(data));
 
     _cookieService.setCookie(T.toString(), encoded);
 

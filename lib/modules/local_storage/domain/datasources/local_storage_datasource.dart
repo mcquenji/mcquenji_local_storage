@@ -7,16 +7,16 @@ abstract class LocalStorageDatasource extends Datasource {
   @override
   String get name => 'LocalStorage';
 
-  /// Reads the data from the local storage.
+  /// Reads data of type [T] from the local storage.
   Future<T> read<T>();
 
-  /// Writes the data to the local storage.
+  /// Writes the given [data] to the local storage.
   Future<void> write<T>(T data);
 
-  /// Deletes the data from the local storage.
+  /// Deletes the data of type [T] from the local storage.
   Future<void> delete<T>();
 
-  /// Checks if the data exists in the local storage.
+  /// Checks if data of type [T] exists in the local storage.
   Future<bool> exists<T>();
 
   /// Gets the [IGenericSerializer] for the type [T].
@@ -30,6 +30,24 @@ abstract class LocalStorageDatasource extends Datasource {
     }
 
     return config;
+  }
+
+  /// Serializes the given [data] to [JSON].
+  @protected
+  @nonVirtual
+  JSON serialize<T>(T data) {
+    final serde = getSerde<T>();
+
+    return serde.serialize(data);
+  }
+
+  /// Deserializes the given [json] to [T].
+  @protected
+  @nonVirtual
+  T deserialize<T>(JSON json) {
+    final serde = getSerde<T>();
+
+    return serde.deserialize(json);
   }
 }
 

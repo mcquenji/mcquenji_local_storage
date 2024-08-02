@@ -16,27 +16,31 @@ class DefaultLocalStorageDatasource extends LocalStorageDatasource {
 
   @override
   Future<void> delete<T>() async {
-    log('Deleting $T');
+    log('Deleting ${T.toString().sanitized}');
 
-    final f = await _pathResolverService.resolveFile(T.toString());
+    final f = await _pathResolverService.resolveFile(T.toString().sanitized);
+
+    if (!await exists()) {
+      log('${T.toString().sanitized} does not exist at ${f.path}');
+
+      return;
+    }
 
     await f.delete();
 
-    log('$T deleted at ${f.path}');
+    log('${T.toString().sanitized} deleted at ${f.path}');
   }
 
   @override
   Future<T> read<T>() async {
-    final serde = getSerde<T>();
-
-    log('Reading $T');
+    log('Reading ${T.toString().sanitized}');
 
     final f = await _pathResolverService.resolveFile(T.toString());
 
     if (!await exists()) {
       final e = LocalStorageException('${f.path} does not exist or is empty. Cannot read data.');
 
-      log('Failed to read $T', e);
+      log('Failed to read ${T.toString().sanitized}', e);
 
       throw e;
     }
@@ -44,36 +48,34 @@ class DefaultLocalStorageDatasource extends LocalStorageDatasource {
     try {
       final contents = await f.readAsString();
 
-      final data = serde.deserialize(jsonDecode(contents));
+      final data = deserialize(jsonDecode(contents));
 
-      log('Read $T');
+      log('Read ${T.toString().sanitized}');
 
       return data;
     } catch (e, s) {
-      log('Failed to read $T at ${f.path}', e, s);
+      log('Failed to read ${T.toString().sanitized} at ${f.path}', e, s);
 
-      throw LocalStorageException('Failed to read $T: $e');
+      throw LocalStorageException('Failed to read ${T.toString().sanitized}: $e');
     }
   }
 
   @override
   Future<void> write<T>(T data) async {
-    final serde = getSerde<T>();
+    log('Writing ${T.toString().sanitized}');
 
-    log('Writing $T');
-
-    final f = await _pathResolverService.resolveFile(T.toString());
+    final f = await _pathResolverService.resolveFile(T.toString().sanitized);
 
     try {
-      final contents = jsonEncode(serde.serialize(data));
+      final contents = jsonEncode(serialize(data));
 
       await f.writeAsString(contents);
 
-      log('Wrote $T at ${f.path}');
+      log('Wrote ${T.toString().sanitized} at ${f.path}');
     } catch (e, s) {
-      log('Failed to write $T at ${f.path}', e, s);
+      log('Failed to write ${T.toString().sanitized} at ${f.path}', e, s);
 
-      throw LocalStorageException('Failed to write $T: $e');
+      throw LocalStorageException('Failed to write ${T.toString().sanitized}: $e');
     }
   }
 
