@@ -32,8 +32,8 @@ class LocalStorageModule extends Module {
   /// See [PackageInfo.fromPlatform] for more information.
   static String? baseUrl;
 
-  /// Path to store data in when running in debug mode (non-web).
-  static String debugPath = './build/debug';
+  /// Overrides the path resolver service for testing or debug purposes.
+  static String? overridePath = kDebugMode ? './build/debug' : null;
 
   @override
   List<Module> get imports => [
@@ -46,8 +46,8 @@ class LocalStorageModule extends Module {
 
     if (PlatformUtils.isDesktop || PlatformUtils.isMobile) {
       i.add<PathResolverService>(
-        kDebugMode
-            ? () => DebugPathResolverService(debugPath)
+        overridePath != null
+            ? () => DebugPathResolverService(overridePath!)
             : Platform.isLinux
                 ? LinuxPathResolverService.new
                 : DefaultPathResolverService.new,
