@@ -9,23 +9,15 @@ import 'package:mcquenji_local_storage/modules/local_storage/infra/infra.dart';
 
 /// Extension to add a serializer to the injector.
 extension InjectorUtils on Injector {
-  /// The types that are considered recursive and should not have collection serializers added.
-  static const recursiveTypes = {
-    Iterable,
-    Map,
-    List,
-    Set,
-  };
-
   /// Registers an implementation of [IGenericSerializer] for type [T].
   ///
   /// This will also add collection serializers for [T] if [T] is not an [Iterable] or [Map].
-  void addSerde<T>({required T Function(JSON) fromJson, required JSON Function(T) toJson}) {
+  void addSerde<T>({required T Function(JSON) fromJson, required JSON Function(T) toJson, bool registerCollections = true}) {
     addLazySingleton<IGenericSerializer<T, JSON>>(
       (i) => _IGenericSerializerImpl<T>(fromJson, toJson),
     );
 
-    if (recursiveTypes.any((type) => T == type)) return;
+    if (!registerCollections) return;
 
     addIterableSerde<T>();
     addListSerde<T>();
@@ -57,6 +49,7 @@ extension InjectorUtils on Injector {
           ),
         );
       },
+      registerCollections: false,
     );
   }
 
@@ -82,6 +75,7 @@ extension InjectorUtils on Injector {
 
         return {C.toString(): iterable.map(serde.serialize).toList()};
       },
+      registerCollections: false,
     );
   }
 
