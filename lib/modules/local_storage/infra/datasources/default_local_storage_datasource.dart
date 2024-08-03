@@ -16,31 +16,31 @@ class DefaultLocalStorageDatasource extends LocalStorageDatasource {
 
   @override
   Future<void> delete<T>() async {
-    log('Deleting ${T.toString().sanitized}');
+    log('Deleting $T');
 
     final f = await _pathResolverService.resolveFile(T.toString().sanitized);
 
     if (!await exists()) {
-      log('${T.toString().sanitized} does not exist at ${f.path}');
+      log('$T does not exist at ${f.path}');
 
       return;
     }
 
     await f.delete();
 
-    log('${T.toString().sanitized} deleted at ${f.path}');
+    log('$T deleted at ${f.path}');
   }
 
   @override
   Future<T> read<T>() async {
-    log('Reading ${T.toString().sanitized}');
+    log('Reading $T');
 
-    final f = await _pathResolverService.resolveFile(T.toString());
+    final f = await _pathResolverService.resolveFile(T.toString().sanitized);
 
     if (!await exists()) {
       final e = LocalStorageException('${f.path} does not exist or is empty. Cannot read data.');
 
-      log('Failed to read ${T.toString().sanitized}', e);
+      log('Failed to read $T', e);
 
       throw e;
     }
@@ -50,19 +50,19 @@ class DefaultLocalStorageDatasource extends LocalStorageDatasource {
 
       final data = deserialize(jsonDecode(contents));
 
-      log('Read ${T.toString().sanitized}');
+      log('Read $T');
 
       return data;
     } catch (e, s) {
-      log('Failed to read ${T.toString().sanitized} at ${f.path}', e, s);
+      log('Failed to read $T at ${f.path}', e, s);
 
-      throw LocalStorageException('Failed to read ${T.toString().sanitized}: $e');
+      throw LocalStorageException('Failed to read $T: $e');
     }
   }
 
   @override
   Future<void> write<T>(T data) async {
-    log('Writing ${T.toString().sanitized}');
+    log('Writing $T');
 
     final f = await _pathResolverService.resolveFile(T.toString().sanitized);
 
@@ -71,11 +71,11 @@ class DefaultLocalStorageDatasource extends LocalStorageDatasource {
 
       await f.writeAsString(contents);
 
-      log('Wrote ${T.toString().sanitized} at ${f.path}');
+      log('Wrote $T at ${f.path}');
     } catch (e, s) {
-      log('Failed to write ${T.toString().sanitized} at ${f.path}', e, s);
+      log('Failed to write $T at ${f.path}', e, s);
 
-      throw LocalStorageException('Failed to write ${T.toString().sanitized}: $e');
+      throw LocalStorageException('Failed to write $T: $e');
     }
   }
 
