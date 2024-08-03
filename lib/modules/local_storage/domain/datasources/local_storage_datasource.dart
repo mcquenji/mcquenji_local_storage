@@ -23,13 +23,13 @@ abstract class LocalStorageDatasource extends Datasource {
   @nonVirtual
   @protected
   IGenericSerializer<T, JSON> getSerde<T>() {
-    final config = Modular.tryGet<IGenericSerializer<T, JSON>>();
+    final serde = Modular.tryGet<IGenericSerializer<T, JSON>>();
 
-    if (config == null) {
+    if (serde == null) {
       throw LocalStorageException('No serializer found for $T. Did you forget registering it?');
     }
 
-    return config;
+    return serde;
   }
 
   /// Serializes the given [data] to [JSON].

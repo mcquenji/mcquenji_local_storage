@@ -14,13 +14,17 @@ export 'utils/utils.dart';
 
 /// Provides local storage access in a modular way.
 ///
-/// To use this you need to provide an [IGenericSerializer] instance for the type you want to store.
+/// You need to initialize this module in your app module to use it by
+/// importing it and calling [InjectorUtils.setupLocalStorage] in your module's [Module.binds].
+/// Additionally you need to provide an [IGenericSerializer] instance for the type you want to store
+/// by calling [InjectorUtils.addSerde].
 ///
 /// Example:
 /// ```dart
 /// @override
 /// void binds(Injector i) {
-///    i.addSerde<MyModel>(
+///    i.setupLocalStorage(); // This is required to use the local storage module.
+///    i.addSerde<MyModel>( // This is required to store MyModel instances.
 ///      fromJson: MyModel.fromJson,
 ///      toJson: (m) => m.toJson(),
 ///    );
@@ -58,6 +62,24 @@ class LocalStorageModule extends Module {
       i.add<CookieService>(WebCookieService.new);
     }
 
-    i.add<LocalStorageDatasource>(kIsWeb ? WebLocalStorageDatasource.new : DefaultLocalStorageDatasource.new);
+    // Add serializers for basic types
+    i
+      ..addSerde<int>(fromJson: (j) => j['int'], toJson: (i) => {'int': i})
+      ..addSerde<double>(fromJson: (j) => j['double'], toJson: (d) => {'double': d})
+      ..addSerde<String>(fromJson: (j) => j['string'], toJson: (s) => {'string': s})
+      ..addSerde<bool>(fromJson: (j) => j['bool'], toJson: (b) => {'bool': b})
+      ..addSerde<DateTime>(
+        fromJson: (j) => DateTime.fromMillisecondsSinceEpoch(j['datetime']),
+        toJson: (d) => {'datetime': d.millisecondsSinceEpoch},
+      )
+      ..addSerde<Duration>(
+        fromJson: (j) => Duration(milliseconds: j['duration']),
+        toJson: (d) => {'duration': d.inMilliseconds},
+      )
+      ..addSerde<Uri>(
+        fromJson: (j) => Uri.parse(j['uri']),
+        toJson: (u) => {'uri': u.toString()},
+      )
+      ..addListSerde<int>();
   }
 }
