@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:mcquenji_local_storage/modules/local_storage/infra/datasources/web_local_storage_datasource.dart';
 import 'package:mcquenji_local_storage/modules/local_storage/local_storage.dart';
 
 /// Implementation of [LocalStorageDatasource] for all platforms except web.
+///
+/// Use [WebLocalStorageDatasource] for web.
 class DefaultLocalStorageDatasource extends LocalStorageDatasource {
   final PathResolverService _pathResolverService;
 
@@ -18,9 +21,9 @@ class DefaultLocalStorageDatasource extends LocalStorageDatasource {
   Future<void> delete<T>() async {
     log('Deleting $T');
 
-    final f = await _pathResolverService.resolveFile(T.toString().sanitized);
+    final f = await _pathResolverService.resolveFile(T.consistentHash);
 
-    if (!await exists()) {
+    if (!await exists<T>()) {
       log('$T does not exist at ${f.path}');
 
       return;
@@ -35,9 +38,9 @@ class DefaultLocalStorageDatasource extends LocalStorageDatasource {
   Future<T> read<T>() async {
     log('Reading $T');
 
-    final f = await _pathResolverService.resolveFile(T.toString().sanitized);
+    final f = await _pathResolverService.resolveFile(T.consistentHash);
 
-    if (!await exists()) {
+    if (!await exists<T>()) {
       final e = LocalStorageException('${f.path} does not exist or is empty. Cannot read data.');
 
       log('Failed to read $T', e);
@@ -48,7 +51,7 @@ class DefaultLocalStorageDatasource extends LocalStorageDatasource {
     try {
       final contents = await f.readAsString();
 
-      final data = deserialize(jsonDecode(contents));
+      final data = deserialize<T>(jsonDecode(contents));
 
       log('Read $T');
 
@@ -64,7 +67,7 @@ class DefaultLocalStorageDatasource extends LocalStorageDatasource {
   Future<void> write<T>(T data) async {
     log('Writing $T');
 
-    final f = await _pathResolverService.resolveFile(T.toString().sanitized);
+    final f = await _pathResolverService.resolveFile(T.consistentHash);
 
     try {
       final contents = jsonEncode(serialize(data));
@@ -81,9 +84,7 @@ class DefaultLocalStorageDatasource extends LocalStorageDatasource {
 
   @override
   Future<bool> exists<T>() async {
-    final f = await _pathResolverService.resolveFile(T.toString());
-
-    if (!f.existsSync()) return false;
+    final f = await _pathResolverService.resolveFile(T.consistentHash);
 
     return f.readAsStringSync().trim().isNotEmpty;
   }

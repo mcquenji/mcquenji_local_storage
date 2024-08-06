@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mcquenji_core/mcquenji_core.dart';
+import 'package:mcquenji_local_storage/modules/local_storage/local_storage.dart';
 
 /// A datasource that reads and writes data to the local storage.
 abstract class LocalStorageDatasource extends Datasource {
@@ -23,31 +26,46 @@ abstract class LocalStorageDatasource extends Datasource {
   @nonVirtual
   @protected
   IGenericSerializer<T, JSON> getSerde<T>() {
-    final serde = Modular.tryGet<IGenericSerializer<T, JSON>>();
-
-    if (serde == null) {
-      throw LocalStorageException('No serializer found for $T. Did you forget registering it?');
+    try {
+      return Modular.get<LocalStorageSerializer<T>>();
+    } on Exception catch (e) {
+      throw LocalStorageException('No serializer found for $T: $e. Did you forget registering it?');
     }
-
-    return serde;
   }
 
-  /// Serializes the given [data] to [JSON].
+  /// Serializes the given [data].
+  ///
+  /// The returned value is the [JSON] representation of [data] encoded to a base64 string.
   @protected
   @nonVirtual
-  JSON serialize<T>(T data) {
+  String serialize<T>(T data) {
     final serde = getSerde<T>();
 
-    return serde.serialize(data);
+    return base64Encode(
+      jsonEncode(
+        serde.serialize(
+          data,
+        ),
+      ).codeUnits,
+    );
   }
 
-  /// Deserializes the given [json] to [T].
+  /// Deserializes the given [data] to [T] where
+  /// [data] is expected to be a base64 encoded string.
   @protected
   @nonVirtual
-  T deserialize<T>(JSON json) {
+  T deserialize<T>(String data) {
     final serde = getSerde<T>();
 
-    return serde.deserialize(json);
+    return serde.deserialize(
+      jsonDecode(
+        String.fromCharCodes(
+          base64Decode(
+            data,
+          ),
+        ),
+      ),
+    );
   }
 }
 

@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:mcquenji_local_storage/modules/local_storage/infra/datasources/default_local_storage_datasource.dart';
 import 'package:mcquenji_local_storage/modules/local_storage/local_storage.dart';
 
 /// [LocalStorageDatasource] implementation for web.
+///
+/// Use [DefaultLocalStorageDatasource] for all other platforms.
 class WebLocalStorageDatasource extends LocalStorageDatasource {
   final CookieService _cookieService;
 
@@ -16,17 +19,17 @@ class WebLocalStorageDatasource extends LocalStorageDatasource {
 
   @override
   Future<void> delete<T>() async {
-    _cookieService.deleteCookie(T.toString());
+    _cookieService.deleteCookie(T.consistentHash);
 
     log('Deleted $T');
   }
 
   @override
-  Future<bool> exists<T>() async => _cookieService.exists(T.toString());
+  Future<bool> exists<T>() async => _cookieService.exists(T.consistentHash);
 
   @override
   Future<T> read<T>() async {
-    final data = _cookieService.getCookie(T.toString());
+    final data = _cookieService.getCookie(T.consistentHash);
 
     if (data == null) {
       final e = LocalStorageException('No data found for $T');
@@ -45,7 +48,7 @@ class WebLocalStorageDatasource extends LocalStorageDatasource {
   Future<void> write<T>(T data) async {
     final encoded = jsonEncode(serialize(data));
 
-    _cookieService.setCookie(T.toString(), encoded);
+    _cookieService.setCookie(T.consistentHash, encoded);
 
     log('Wrote $T');
   }

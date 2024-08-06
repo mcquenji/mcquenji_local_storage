@@ -12,25 +12,28 @@ export 'domain/domain.dart';
 export 'presentation/presentation.dart';
 export 'utils/utils.dart';
 
+/// {@template local_storage_module}
 /// Provides local storage access in a modular way.
 ///
-/// You need to initialize this module in your app module to use it by
-/// importing it and calling [InjectorUtils.setupLocalStorage] in your module's [Module.binds].
-/// Additionally you need to provide an [IGenericSerializer] instance for the type you want to store
+/// You need to provide an [LocalStorageSerializer] instance for the type you want to store
 /// by calling [InjectorUtils.addSerde].
 ///
 /// Example:
 /// ```dart
 /// @override
 /// void binds(Injector i) {
-///    i.setupLocalStorage(); // This is required to use the local storage module.
-///    i.addSerde<MyModel>( // This is required to store MyModel instances.
+///    // This is required to store MyModel instances.
+///    i.addSerde<MyModel>(
 ///      fromJson: MyModel.fromJson,
 ///      toJson: (m) => m.toJson(),
 ///    );
 /// }
 /// ```
+/// {@endtemplate}
 class LocalStorageModule extends Module {
+  /// {@macro local_storage_module}
+  LocalStorageModule();
+
   /// Base URL to get the package info (web only).
   ///
   /// See [PackageInfo.fromPlatform] for more information.
@@ -58,6 +61,8 @@ class LocalStorageModule extends Module {
       );
     }
 
+    i.add<LocalStorageDatasource>(kIsWeb ? WebLocalStorageDatasource.new : DefaultLocalStorageDatasource.new);
+
     if (kIsWeb) {
       i.add<CookieService>(WebCookieService.new);
     }
@@ -79,7 +84,12 @@ class LocalStorageModule extends Module {
       ..addSerde<Uri>(
         fromJson: (j) => Uri.parse(j['uri']),
         toJson: (u) => {'uri': u.toString()},
-      )
-      ..addListSerde<int>();
+      );
   }
+}
+
+/// A serializer for local storage.
+abstract class LocalStorageSerializer<T> extends IGenericSerializer<T, JSON> {
+  /// A serializer for converting objects to and from JSON for local storage.
+  const LocalStorageSerializer();
 }

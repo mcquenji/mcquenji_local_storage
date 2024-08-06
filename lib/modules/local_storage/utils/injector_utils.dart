@@ -1,20 +1,20 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mcquenji_core/mcquenji_core.dart';
 
-import 'package:mcquenji_local_storage/modules/local_storage/domain/domain.dart';
-import 'package:mcquenji_local_storage/modules/local_storage/infra/infra.dart';
+import 'package:mcquenji_local_storage/modules/local_storage/local_storage.dart';
 
 /// Extension to add a serializer to the injector.
 extension InjectorUtils on Injector {
-  /// Registers an implementation of [IGenericSerializer] for type [T].
+  /// Registers an implementation of [LocalStorageSerializer] for type [T].
   ///
   /// This will also add collection serializers for [T] if [T] is not an [Iterable] or [Map].
+  ///
+  /// If [registerCollections] is `true` (default), this will also register serializers for [Iterable], [List], and [Set] of [T].
   void addSerde<T>({required T Function(JSON) fromJson, required JSON Function(T) toJson, bool registerCollections = true}) {
-    addLazySingleton<IGenericSerializer<T, JSON>>(
-      (i) => _IGenericSerializerImpl<T>(fromJson, toJson),
+    addInstance<LocalStorageSerializer<T>>(
+      _SerdeImpl<T>(fromJson, toJson),
     );
 
     if (!registerCollections) return;
@@ -24,12 +24,12 @@ extension InjectorUtils on Injector {
     addSetSerde<T>();
   }
 
-  /// Registers an implementation of [IGenericSerializer] for a [Map] with of [K] and [V].
+  /// Registers an implementation of [LocalStorageSerializer] for a [Map] with of [K] and [V].
   void addMapSerde<K, V>() {
     addSerde(
       fromJson: (json) {
-        final keySerde = Modular.get<IGenericSerializer<K, JSON>>();
-        final valueSerde = Modular.get<IGenericSerializer<V, JSON>>();
+        final keySerde = Modular.get<LocalStorageSerializer<K>>();
+        final valueSerde = Modular.get<LocalStorageSerializer<V>>();
 
         return json.map(
           (key, value) => MapEntry(
@@ -39,8 +39,8 @@ extension InjectorUtils on Injector {
         );
       },
       toJson: (map) {
-        final keySerde = Modular.get<IGenericSerializer<K, JSON>>();
-        final valueSerde = Modular.get<IGenericSerializer<V, JSON>>();
+        final keySerde = Modular.get<LocalStorageSerializer<K>>();
+        final valueSerde = Modular.get<LocalStorageSerializer<V>>();
 
         return map.map(
           (key, value) => MapEntry(
@@ -53,7 +53,7 @@ extension InjectorUtils on Injector {
     );
   }
 
-  /// Registers an implementation of [IGenericSerializer] for a collection of [T].
+  /// Registers an implementation of [LocalStorageSerializer] for a collection of [T].
   ///
   /// The [converter] function is used to convert the [Iterable] of [T] to the desired collection [C].
   ///
@@ -61,7 +61,7 @@ extension InjectorUtils on Injector {
   void addCollectionSerde<T, C extends Iterable<T>>(C Function(Iterable<T> it) converter) {
     addSerde<C>(
       fromJson: (json) {
-        final serde = Modular.get<IGenericSerializer<T, JSON>>();
+        final serde = Modular.get<LocalStorageSerializer<T>>();
 
         final it = json[C.toString()] as Iterable;
 
@@ -71,7 +71,7 @@ extension InjectorUtils on Injector {
         return converter(it.map((e) => serde.deserialize(e)));
       },
       toJson: (iterable) {
-        final serde = Modular.get<IGenericSerializer<T, JSON>>();
+        final serde = Modular.get<LocalStorageSerializer<T>>();
 
         return {C.toString(): iterable.map(serde.serialize).toList()};
       },
@@ -79,22 +79,16 @@ extension InjectorUtils on Injector {
     );
   }
 
-  /// Registers an implementation of [IGenericSerializer] for an [Iterable] of [T].
-  ///
-  /// This is a shorthand for [addCollectionSerde] with [Iterable] as the collection type.
+  /// Registers an implementation of [LocalStorageSerializer] for an [Iterable] of [T].
   void addIterableSerde<T>() => addCollectionSerde<T, Iterable<T>>((it) => it);
 
-  /// Registers an implementation of [IGenericSerializer] for a [List] of [T].
-  ///
-  /// This is a shorthand for [addCollectionSerde] with [List] as the collection type.
+  /// Registers an implementation of [LocalStorageSerializer] for a [List] of [T].
   void addListSerde<T>() => addCollectionSerde<T, List<T>>((it) => it.toList());
 
-  /// Registers an implementation of [IGenericSerializer] for a [Set] of [T].
-  ///
-  /// This is a shorthand for [addCollectionSerde] with [Set] as the collection type.
+  /// Registers an implementation of [LocalStorageSerializer] for a [Set] of [T].
   void addSetSerde<T>() => addCollectionSerde<T, Set<T>>((it) => it.toSet());
 
-  /// Registers an implementation of [IGenericSerializer] for an [Enum] of type [T].
+  /// Registers an implementation of [LocalStorageSerializer] for an [Enum] of type [T].
   ///
   /// Example:
   /// ```dart
@@ -108,7 +102,7 @@ extension InjectorUtils on Injector {
         final index = json[T.toString()] as int;
 
         if (index < 0 || index >= values.length) {
-          throw LocalStorageException('Invalid index for enum $T: $index');
+          throw LocalStorageException('Error parsing $T: Invalid index for enum $T: $index');
         }
 
         return values[index];
@@ -116,24 +110,17 @@ extension InjectorUtils on Injector {
       toJson: (e) => {T.toString(): e.index},
     );
   }
-
-  /// Sets up the local storage module by injecting an [LocalStorageDatasource] implementation.
-  ///
-  /// You must call this manually in your module, otherwise this module will not work.
-  void setupLocalStorage() {
-    add<LocalStorageDatasource>(kIsWeb ? WebLocalStorageDatasource.new : DefaultLocalStorageDatasource.new);
-  }
 }
 
-class _IGenericSerializerImpl<T> implements IGenericSerializer<T, JSON> {
-  final T Function(JSON) fromJson;
-  final JSON Function(T) toJson;
+class _SerdeImpl<T> extends LocalStorageSerializer<T> {
+  final T Function(JSON) _fromJson;
+  final JSON Function(T) _toJson;
 
-  _IGenericSerializerImpl(this.fromJson, this.toJson);
-
-  @override
-  T deserialize(JSON data) => fromJson(data);
+  const _SerdeImpl(this._fromJson, this._toJson);
 
   @override
-  JSON serialize(T data) => toJson(data);
+  T deserialize(JSON data) => _fromJson(data);
+
+  @override
+  JSON serialize(T data) => _toJson(data);
 }

@@ -11,11 +11,16 @@ abstract class PathResolverService extends Service {
   @nonVirtual
   Future<File> resolveFile(String file) async {
     final dir = await resolveAppDataDir();
+    await dir.create(recursive: true);
+
     final path = '${dir.path}/$file';
 
     log('Resolved file path: $path');
 
-    return File(path);
+    final f = File(path);
+    await f.create();
+
+    return f;
   }
 
   /// Resolves the application's local storage directory.
@@ -32,10 +37,15 @@ abstract class PathResolverService extends Service {
   @nonVirtual
   Future<File> newTempFile() async {
     final dir = await resolveTempDir();
+    await dir.create(recursive: true);
+
     final path = '${dir.path}/${DateTime.now().millisecondsSinceEpoch}';
 
     log('Resolved new temporary file: $path');
 
-    return File(path);
+    final f = File(path);
+    await f.create();
+
+    return f;
   }
 }
