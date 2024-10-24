@@ -29,7 +29,7 @@ class WebLocalStorageDatasource extends LocalStorageDatasource {
 
   @override
   Future<T> read<T>() async {
-    final data = _cookieService.getCookie(T.consistentHash);
+    final data = await _cookieService.getCookie(T.consistentHash);
 
     if (data == null) {
       final e = LocalStorageException('No data found for $T');
@@ -41,12 +41,12 @@ class WebLocalStorageDatasource extends LocalStorageDatasource {
 
     log('Read $T');
 
-    return deserialize(data);
+    return deserialize<T>(data);
   }
 
   @override
   Future<void> write<T>(T data) async {
-    final encoded = serialize(data);
+    final encoded = serialize<T>(data);
 
     _cookieService.setCookie(T.consistentHash, encoded);
 
