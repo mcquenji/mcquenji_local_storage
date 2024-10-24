@@ -41,12 +41,12 @@ class WebLocalStorageDatasource extends LocalStorageDatasource {
 
     log('Read $T');
 
-    return deserialize(jsonDecode(data));
+    return deserialize(data);
   }
 
   @override
   Future<void> write<T>(T data) async {
-    final encoded = jsonEncode(serialize(data));
+    final encoded = serialize(data);
 
     _cookieService.setCookie(T.consistentHash, encoded);
 
