@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:mcquenji_local_storage/modules/local_storage/infra/datasources/default_local_storage_datasource.dart';
 import 'package:mcquenji_local_storage/modules/local_storage/local_storage.dart';
 
@@ -29,7 +27,7 @@ class WebLocalStorageDatasource extends LocalStorageDatasource {
 
   @override
   Future<T> read<T>() async {
-    final data = await _cookieService.getCookie(T.consistentHash);
+    final data = _cookieService.getCookie(T.consistentHash);
 
     if (data == null) {
       final e = LocalStorageException('No data found for $T');

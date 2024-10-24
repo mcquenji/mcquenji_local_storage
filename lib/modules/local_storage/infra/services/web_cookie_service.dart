@@ -49,7 +49,7 @@ class WebCookieService extends CookieService {
       for (final cookie in cookies) {
         final parts = cookie.split('=');
         if (parts[0] == key) {
-          return parts[1];
+          return parts.sublist(1).join('=');
         }
       }
       return null;
