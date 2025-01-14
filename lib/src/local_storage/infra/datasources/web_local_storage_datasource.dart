@@ -1,9 +1,5 @@
-import 'package:mcquenji_local_storage/modules/local_storage/infra/datasources/default_local_storage_datasource.dart';
-import 'package:mcquenji_local_storage/modules/local_storage/local_storage.dart';
-import 'package:mcquenji_local_storage/src/local_storage/infra/datasources/datasources.dart';
-import 'package:mcquenji_local_storage/src/local_storage/infra/datasources/default_local_storage_datasource.dart';
+import 'package:mcquenji_local_storage/mcquenji_local_storage.dart';
 import 'package:mcquenji_local_storage/src/local_storage/infra/infra.dart';
-import 'package:mcquenji_local_storage/src/local_storage/local_storage.dart';
 
 /// [LocalStorageDatasource] implementation for web.
 ///

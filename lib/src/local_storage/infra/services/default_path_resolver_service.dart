@@ -1,8 +1,4 @@
-import 'package:mcquenji_local_storage/modules/local_storage/local_storage.dart';
-import 'package:mcquenji_local_storage/src/local_storage/domain/domain.dart';
-import 'package:mcquenji_local_storage/src/local_storage/domain/services/path_resolver_service.dart';
-import 'package:mcquenji_local_storage/src/local_storage/domain/services/services.dart';
-import 'package:mcquenji_local_storage/src/local_storage/local_storage.dart';
+import 'package:mcquenji_local_storage/mcquenji_local_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:universal_io/io.dart';

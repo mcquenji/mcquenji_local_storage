@@ -1,11 +1,7 @@
 import 'dart:convert';
 
-import 'package:mcquenji_local_storage/modules/local_storage/infra/datasources/web_local_storage_datasource.dart';
-import 'package:mcquenji_local_storage/modules/local_storage/local_storage.dart';
-import 'package:mcquenji_local_storage/src/local_storage/infra/datasources/datasources.dart';
-import 'package:mcquenji_local_storage/src/local_storage/infra/datasources/web_local_storage_datasource.dart';
+import 'package:mcquenji_local_storage/mcquenji_local_storage.dart';
 import 'package:mcquenji_local_storage/src/local_storage/infra/infra.dart';
-import 'package:mcquenji_local_storage/src/local_storage/local_storage.dart';
 
 /// Implementation of [LocalStorageDatasource] for all platforms except web.
 ///
