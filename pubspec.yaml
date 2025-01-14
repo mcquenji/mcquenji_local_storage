@@ -1,6 +1,6 @@
 name: mcquenji_local_storage
 description: "Module for storing data locally on the device."
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/mcquenji/mcquenji_local_storage
 publish_to: none # Remove this line if you wish to publish to pub.dev
 platforms:
@@ -8,6 +8,7 @@ platforms:
   windows:
   linux:
   macos:
+
 
 environment:
   sdk: ">=3.4.3 <4.0.0"
