@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the addCollectionSerde method from the InjectorUtils extension, for the Dart programming language.">
+  <title>addCollectionSerde method - InjectorUtils extension - mcquenji_local_storage library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">mcquenji_local_storage</a></li>
+    <li><a href="../../mcquenji_local_storage/mcquenji_local_storage-library.html">mcquenji_local_storage.dart</a></li>
+    <li><a href="../../mcquenji_local_storage/InjectorUtils.html">InjectorUtils</a></li>
+    <li class="self-crumb">addCollectionSerde&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">C extends Iterable&lt;<wbr><span class="type-parameter">T</span>&gt;</span>&gt; method</li>
+  </ol>
+  <div class="self-name">addCollectionSerde</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button" title="Toggle brightness">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span id="dark-theme-button" class="material-symbols-outlined">
+        dark_mode
+      </span>
+      <span id="light-theme-button" class="material-symbols-outlined">
+        light_mode
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar="mcquenji_local_storage&#47;InjectorUtils-extension-sidebar.html"
+    data-below-sidebar="">
+    <div>
+<h1><span class="kind-method">addCollectionSerde&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">C extends Iterable&lt;<wbr><span class="type-parameter">T</span>&gt;</span>&gt;</span> method 
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+<span class="returntype">void</span>
+<span class="name ">addCollectionSerde</span>&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">C extends Iterable&lt;<wbr><span class="type-parameter">T</span>&gt;</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="addCollectionSerde-param-converter"><span class="type-annotation">C</span> <span class="parameter-name">converter</span>(<ol class="parameter-list single-line"> <li><span class="parameter" id="param-it"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Iterable-class.html">Iterable</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">it</span></span></li>
+</ol>)</span></li>
+</ol>)
+
+      
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Registers an implementation of <a href="../../mcquenji_local_storage/LocalStorageSerializer-class.html">LocalStorageSerializer</a> for a collection of <code>T</code>.</p>
+<p>The <code>converter</code> function is used to convert the <a href="https://api.flutter.dev/flutter/dart-core/Iterable-class.html">Iterable</a> of <code>T</code> to the desired collection <code>C</code>.</p>
+<p>See <a href="../../mcquenji_local_storage/InjectorUtils/addIterableSerde.html">addIterableSerde</a>, <a href="../../mcquenji_local_storage/InjectorUtils/addListSerde.html">addListSerde</a>, <a href="../../mcquenji_local_storage/InjectorUtils/addSetSerde.html">addSetSerde</a>.</p>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">void addCollectionSerde&lt;T, C extends Iterable&lt;T&gt;&gt;(C Function(Iterable&lt;T&gt; it) converter) {
+  addSerde&lt;C&gt;(
+    fromJson: (json) {
+      final serde = Modular.get&lt;LocalStorageSerializer&lt;T&gt;&gt;();
+
+      final it = json[C.toString()] as Iterable;
+
+      &#47;&#47; Idk why, but if I make this a lambda i get
+      &#47;&#47; &#39;The argument type &#39;T Function(Map&lt;String, dynamic&gt;)&#39; can&#39;t be assigned to the parameter type &#39;dynamic Function(dynamic)&#39;
+      &#47;&#47; ignore: unnecessary_lambdas
+      return converter(it.map((e) =&gt; serde.deserialize(e)));
+    },
+    toJson: (iterable) {
+      final serde = Modular.get&lt;LocalStorageSerializer&lt;T&gt;&gt;();
+
+      return {C.toString(): iterable.map(serde.serialize).toList()};
+    },
+    registerCollections: false,
+  );
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../../index.html">mcquenji_local_storage</a></li>
+    <li><a href="../../mcquenji_local_storage/mcquenji_local_storage-library.html">mcquenji_local_storage</a></li>
+    <li><a href="../../mcquenji_local_storage/InjectorUtils.html">InjectorUtils</a></li>
+    <li class="self-crumb">addCollectionSerde&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">C extends Iterable&lt;<wbr><span class="type-parameter">T</span>&gt;</span>&gt; method</li>
+</ol>
+
+    <h5>InjectorUtils extension on <a href="https://pub.dev/documentation/auto_injector/2.0.5/auto_injector/Injector-class.html">Injector</a></h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-->
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+</div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    mcquenji_local_storage
+      0.0.1
+  </span>
+  
+</footer>
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+
