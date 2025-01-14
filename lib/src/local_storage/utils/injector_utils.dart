@@ -4,6 +4,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mcquenji_core/mcquenji_core.dart';
 
 import 'package:mcquenji_local_storage/modules/local_storage/local_storage.dart';
+import 'package:mcquenji_local_storage/src/local_storage/local_storage.dart';
 
 /// Extension to add a serializer to the injector.
 extension InjectorUtils on Injector {

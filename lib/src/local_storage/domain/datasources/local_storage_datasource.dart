@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mcquenji_core/mcquenji_core.dart';
-import 'package:mcquenji_local_storage/modules/local_storage/local_storage.dart';
+import 'package:mcquenji_local_storage/src/local_storage/local_storage.dart';
 
 /// A datasource that reads and writes data to the local storage.
 abstract class LocalStorageDatasource extends Datasource {

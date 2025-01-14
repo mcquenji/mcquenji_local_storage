@@ -1,4 +1,4 @@
-import 'package:mcquenji_local_storage/modules/local_storage/local_storage.dart';
+import 'package:mcquenji_local_storage/mcquenji_local_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:universal_io/io.dart';
 

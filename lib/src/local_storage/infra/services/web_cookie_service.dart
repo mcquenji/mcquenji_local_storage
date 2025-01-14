@@ -1,4 +1,8 @@
 import 'package:mcquenji_local_storage/modules/local_storage/local_storage.dart';
+import 'package:mcquenji_local_storage/src/local_storage/domain/domain.dart';
+import 'package:mcquenji_local_storage/src/local_storage/domain/services/cookie_service.dart';
+import 'package:mcquenji_local_storage/src/local_storage/domain/services/services.dart';
+import 'package:mcquenji_local_storage/src/local_storage/local_storage.dart';
 import 'package:universal_html/html.dart' as html;
 
 /// [CookieService] implementation for the web.

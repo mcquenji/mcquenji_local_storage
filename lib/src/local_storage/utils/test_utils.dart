@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:mcquenji_local_storage/modules/local_storage/local_storage.dart';
+import 'package:mcquenji_local_storage/src/local_storage/local_storage.dart';
 import 'package:universal_io/io.dart';
 
 /// Clears the local storage for testing. Do not call before [initializeLocalStorageForTesting].
