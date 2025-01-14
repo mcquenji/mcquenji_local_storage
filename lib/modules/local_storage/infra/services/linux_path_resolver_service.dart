@@ -10,19 +10,18 @@ class LinuxPathResolverService extends PathResolverService {
   LinuxPathResolverService(this._packageInfo);
 
   @override
-  void dispose() {}
-
-  @override
   Future<Directory> resolveAppDataDir() async {
     final info = await _packageInfo;
 
-    return Directory('~/.config/${info.appName}');
+    final home = Platform.environment['HOME']!;
+
+    return Directory('$home/.cache/${info.appName}');
   }
 
   @override
   Future<Directory> resolveTempDir() async {
     final info = await _packageInfo;
 
-    return Directory('~/.cache/${info.appName}');
+    return Directory('/tmp/${info.appName}');
   }
 }

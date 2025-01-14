@@ -14,6 +14,7 @@ class DefaultLocalStorageDatasource extends LocalStorageDatasource {
 
   @override
   void dispose() {
+    super.dispose();
     _pathResolverService.dispose();
   }
 

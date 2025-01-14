@@ -11,9 +11,6 @@ class DefaultPathResolverService extends PathResolverService {
   DefaultPathResolverService(this._packageInfo);
 
   @override
-  void dispose() {}
-
-  @override
   Future<Directory> resolveAppDataDir() async {
     final info = await _packageInfo;
     final dir = await getApplicationDocumentsDirectory();

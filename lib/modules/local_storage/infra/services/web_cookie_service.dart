@@ -4,9 +4,6 @@ import 'package:universal_html/html.dart' as html;
 /// [CookieService] implementation for the web.
 class WebCookieService extends CookieService {
   @override
-  void dispose() {}
-
-  @override
   void deleteAllCookies() {
     log('Deleting all cookies');
     try {

@@ -11,9 +11,6 @@ class DebugPathResolverService extends PathResolverService {
   DebugPathResolverService(this.path);
 
   @override
-  void dispose() {}
-
-  @override
   Future<Directory> resolveAppDataDir() async {
     return Directory(path);
   }

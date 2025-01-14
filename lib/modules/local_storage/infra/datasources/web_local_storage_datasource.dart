@@ -12,6 +12,7 @@ class WebLocalStorageDatasource extends LocalStorageDatasource {
 
   @override
   void dispose() {
+    super.dispose();
     _cookieService.dispose();
   }
 
