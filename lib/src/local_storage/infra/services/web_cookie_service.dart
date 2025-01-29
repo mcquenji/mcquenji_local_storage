@@ -31,7 +31,7 @@ class WebCookieService extends CookieService {
   bool exists(String key) {
     log('Checking existence of cookie: $key');
     try {
-      return getCookie(key) != null;
+      return getCookie(key) != null && getCookie(key)!.isNotEmpty;
     } catch (error, stackTrace) {
       log('Error checking existence of cookie: $key', error, stackTrace);
       return false;
