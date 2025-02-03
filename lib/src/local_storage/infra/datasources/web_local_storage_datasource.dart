@@ -47,7 +47,7 @@ class WebLocalStorageDatasource extends LocalStorageDatasource {
   Future<void> write<T>(T data) async {
     final encoded = serialize<T>(data);
 
-    _cookieService.setCookie(T.consistentHash, encoded);
+    _cookieService.setCookie(T.consistentHash, encoded, expires: 30);
 
     log('Wrote $T');
   }
